@@ -1,0 +1,115 @@
+<!-- templates/search.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Browse Companies</h2>
+
+<div class="row">
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-header">
+                <h5>Filters</h5>
+            </div>
+            <div class="card-body">
+                <form method="get" action="{{ url_for('search') }}">
+                    <div class="mb-3">
+                        <label for="industry" class="form-label">Industry</label>
+                        <select class="form-select" id="industry" name="industry">
+                            <option value="">All Industries</option>
+                            {% for industry in industries %}
+                            <option value="{{ industry }}" {% if industry == request.args.get('industry') %}selected{% endif %}>
+                                {{ industry }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="location" class="form-label">Location</label>
+                        <select class="form-select" id="location" name="location">
+                            <option value="">All Locations</option>
+                            {% for location in locations %}
+                            <option value="{{ location }}" {% if location == request.args.get('location') %}selected{% endif %}>
+                                {{ location }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="size" class="form-label">Company Size</label>
+                        <select class="form-select" id="size" name="size">
+                            <option value="">All Sizes</option>
+                            {% for size in sizes %}
+                            <option value="{{ size }}" {% if size == request.args.get('size') %}selected{% endif %}>
+                                {{ size }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="type" class="form-label">Company Type</label>
+                        <select class="form-select" id="type" name="type">
+                            <option value="">All Types</option>
+                            {% for type in types %}
+                            <option value="{{ type }}" {% if type == request.args.get('type') %}selected{% endif %}>
+                                {{ type }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="min_rating" class="form-label">Minimum Rating</label>
+                        <input type="range" class="form-range" id="min_rating" name="min_rating" min="0" max="5" step="0.1" 
+                               value="{{ request.args.get('min_rating', 0) }}" oninput="ratingValue.value = this.value">
+                        <output id="ratingValue">{{ request.args.get('min_rating', 0) }}</output>/5
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Apply Filters</button>
+                    <a href="{{ url_for('search') }}" class="btn btn-secondary">Clear</a>
+                    
+                    <!-- Add CSV download button -->
+                    <button type="submit" class="btn btn-success mt-2" name="csv" value="true">
+                        Download as CSV
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-9">
+        {% if companies %}
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <p class="mb-0">Found {{ companies|length }} companies</p>
+        </div>
+        
+        <div class="row">
+            {% for company in companies %}
+            <div class="col-md-6 mb-3">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <a href="{{ url_for('company_detail', company_name=company.company_name) }}">
+                                {{ company.company_name }}
+                            </a>
+                        </h5>
+                        <h6 class="card-subtitle mb-2 text-muted">{{ company.industry }}</h6>
+                        <p class="card-text">
+                            <span class="badge bg-primary">{{ company.company_rating }}/5</span>
+                            <span class="ms-2">{{ company.location }}</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="alert alert-info">
+            No companies found matching your criteria.
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

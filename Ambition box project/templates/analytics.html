@@ -1,0 +1,141 @@
+<!-- templates/analytics.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Company Analytics</h1>
+<p class="lead">Explore insights and trends from our company database</p>
+
+<!-- Filter Form -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5>Filter Data</h5>
+    </div>
+    <div class="card-body">
+        <form method="get" action="{{ url_for('analytics') }}">
+            <div class="row">
+                <div class="col-md-3">
+                    <label for="industry" class="form-label">Industry</label>
+                    <select class="form-select" id="industry" name="industry">
+                        <option value="">All Industries</option>
+                        {% for industry in industries %}
+                        <option value="{{ industry }}" {% if industry == current_industry %}selected{% endif %}>
+                            {{ industry }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="location" class="form-label">Location</label>
+                    <select class="form-select" id="location" name="location">
+                        <option value="">All Locations</option>
+                        {% for location in locations %}
+                        <option value="{{ location }}" {% if location == current_location %}selected{% endif %}>
+                            {{ location }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="size" class="form-label">Company Size</label>
+                    <select class="form-select" id="size" name="size">
+                        <option value="">All Sizes</option>
+                        {% for size in sizes %}
+                        <option value="{{ size }}" {% if size == current_size %}selected{% endif %}>
+                            {{ size }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="min_rating" class="form-label">Min Rating</label>
+                    <input type="number" class="form-control" id="min_rating" name="min_rating" 
+                           min="0" max="5" step="0.1" value="{{ current_min_rating }}">
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-md-12">
+                    <button type="submit" class="btn btn-primary">Apply Filters</button>
+                    <a href="{{ url_for('analytics') }}" class="btn btn-secondary">Clear Filters</a>
+                    <span class="ms-3 text-muted">
+                        Showing {{ filtered_companies_count }} companies
+                    </span>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<ul class="nav nav-tabs" id="analyticsTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="dashboard-tab" data-bs-toggle="tab" data-bs-target="#dashboard" type="button" role="tab">Dashboard</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="distribution-tab" data-bs-toggle="tab" data-bs-target="#distribution" type="button" role="tab">Distribution Analysis</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="comparison-tab" data-bs-toggle="tab" data-bs-target="#comparison" type="button" role="tab">Comparison Analysis</button>
+    </li>
+</ul>
+
+<div class="tab-content mt-3" id="analyticsTabsContent">
+    <div class="tab-pane fade show active" id="dashboard" role="tabpanel">
+        <div class="card">
+            <div class="card-body">
+                {{ dashboard_chart|safe }}
+            </div>
+        </div>
+    </div>
+    
+    <div class="tab-pane fade" id="distribution" role="tabpanel">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Company Age Distribution</h5>
+                        {{ company_age_chart|safe }}
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Company Rating Distribution</h5>
+                        {{ rating_dist_chart|safe }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="tab-pane fade" id="comparison" role="tabpanel">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Company Age vs Rating</h5>
+                        {{ age_vs_rating_chart|safe }}
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Rating by Company Size</h5>
+                        {{ rating_by_size_chart|safe }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Top Companies by Rating</h5>
+                        {{ rating_by_name_chart|safe }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

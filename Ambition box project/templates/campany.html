@@ -1,0 +1,206 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h2>{{ company.company_name }}</h2>
+            </div>
+            <div class="card-body">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h5>Company Details</h5>
+                        <table class="table table-borderless">
+                            <tr>
+                                <th>Industry:</th>
+                                <td>{{ company.industry }}</td>
+                            </tr>
+                            <tr>
+                                <th>Location:</th>
+                                <td>{{ company.location }}</td>
+                            </tr>
+                            <tr>
+                                <th>Size:</th>
+                                <td>{{ company.size }}</td>
+                            </tr>
+                            <tr>
+                                <th>Type:</th>
+                                <td>{{ company.type }}</td>
+                            </tr>
+                            <tr>
+                                <th>Rating:</th>
+                                <td>
+                                    <span class="badge bg-primary fs-6">{{ company.company_rating }}/5</span>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <h5>Additional Information</h5>
+                        <table class="table table-borderless">
+                            {% if company.founded_year %}
+                            <tr>
+                                <th>Founded:</th>
+                                <td>{{ company.founded_year }}</td>
+                            </tr>
+                            {% endif %}
+                            {% if company.website %}
+                            <tr>
+                                <th>Website:</th>
+                                <td><a href="{{ company.website }}" target="_blank">{{ company.website }}</a></td>
+                            </tr>
+                            {% endif %}
+                            {% if company.specialties %}
+                            <tr>
+                                <th>Specialties:</th>
+                                <td>{{ company.specialties }}</td>
+                            </tr>
+                            {% endif %}
+                        </table>
+                    </div>
+                </div>
+
+                {% if company.description %}
+                <div class="mb-4">
+                    <h5>About</h5>
+                    <p>{{ company.description }}</p>
+                </div>
+                {% endif %}
+
+                {% if company.mission %}
+                <div class="mb-4">
+                    <h5>Mission</h5>
+                    <p class="fst-italic">"{{ company.mission }}"</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Reviews Section (if available in your data) -->
+        {% if company.reviews_count %}
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5>Reviews Summary</h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-md-3">
+                        <div class="display-6 text-primary">{{ company.company_rating }}</div>
+                        <small>Overall Rating</small>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="display-6">{{ company.reviews_count }}</div>
+                        <small>Total Reviews</small>
+                    </div>
+                    {% if company.salary_rating %}
+                    <div class="col-md-3">
+                        <div class="display-6">{{ company.salary_rating }}</div>
+                        <small>Salary Rating</small>
+                    </div>
+                    {% endif %}
+                    {% if company.job_security_rating %}
+                    <div class="col-md-3">
+                        <div class="display-6">{{ company.job_security_rating }}</div>
+                        <small>Job Security</small>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="col-md-4">
+        <!-- Quick Actions -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <a href="{{ url_for('search') }}?q={{ company.company_name|urlencode }}" class="btn btn-outline-primary w-100 mb-2">
+                    Search Similar Companies
+                </a>
+                <a href="{{ url_for('search') }}?industry={{ company.industry|urlencode }}" class="btn btn-outline-secondary w-100 mb-2">
+                    Browse {{ company.industry }} Companies
+                </a>
+                {% if company.website %}
+                <a href="{{ company.website }}" target="_blank" class="btn btn-outline-success w-100">
+                    Visit Company Website
+                </a>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Company Stats -->
+        <div class="card">
+            <div class="card-header">
+                <h5>Company Stats</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Employee Satisfaction:</span>
+                    <span class="fw-bold">
+                        {% if company.company_rating >= 4.0 %}
+                        ⭐⭐⭐⭐⭐
+                        {% elif company.company_rating >= 3.0 %}
+                        ⭐⭐⭐⭐
+                        {% elif company.company_rating >= 2.0 %}
+                        ⭐⭐⭐
+                        {% else %}
+                        ⭐⭐
+                        {% endif %}
+                    </span>
+                </div>
+                {% if company.growth_rating %}
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Growth Opportunities:</span>
+                    <span class="fw-bold">{{ company.growth_rating }}/5</span>
+                </div>
+                {% endif %}
+                {% if company.work_life_balance_rating %}
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Work-Life Balance:</span>
+                    <span class="fw-bold">{{ company.work_life_balance_rating }}/5</span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Back to Search -->
+        <div class="mt-4">
+            <a href="{{ url_for('search') }}" class="btn btn-secondary w-100">
+                ← Back to Company Search
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Related Companies -->
+{% if related_companies %}
+<div class="row mt-5">
+    <div class="col-12">
+        <h4>Similar Companies</h4>
+        <div class="row">
+            {% for related in related_companies %}
+            <div class="col-md-3 mb-3">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h6 class="card-title">
+                            <a href="{{ url_for('company_detail', company_name=related.company_name) }}">
+                                {{ related.company_name }}
+                            </a>
+                        </h6>
+                        <p class="card-text">
+                            <span class="badge bg-primary">{{ related.company_rating }}/5</span>
+                            <small class="text-muted">{{ related.industry }}</small>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
